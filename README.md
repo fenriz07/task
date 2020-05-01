@@ -4,8 +4,7 @@
 
 ## Exercise details
 
-In this exercise we are going to be building a CLI tool that can be used to manage your TODOs in the terminal. The basic usage of the tool is going to look roughly like this:
-
+En este ejercicio vamos a construir una herramienta CLI que se puede utilizar para administrar sus tareas pendientes en el terminal. El uso básico de la herramienta se verá más o menos así:
 ```
 $ task
 task is a CLI for managing your TODOs.
@@ -39,81 +38,81 @@ You have the following tasks:
 1. some task description
 ```
 
-*Note: Lines prefixed with `$` are lines where we type into the terminal, and other lines are output from our program.*
+*Nota: Las líneas con el prefijo $ son líneas donde escribimos en la terminal, y otras líneas salen de nuestro programa.*
 
-Your final CLI won't need to look exactly like this, but this is what I roughly expect mine to look like. In the bonus section we will also discuss a few extra features we could add, but for now we will stick with the three show above:
+Su CLI final no tendrá que verse exactamente así, pero así es como espero que sea la mía. En la sección de bonificación también discutiremos algunas características adicionales que podríamos agregar, pero por ahora nos quedaremos con los tres programas anteriores:
 
-- `add` - adds a new task to our list
-- `list` - lists all of our incomplete tasks
-- `do` - marks a task as complete
+- `add` - agrega una nueva tarea a nuestra lista
+- `list` - enumera todas nuestras tareas incompletas
+- `do` - marca una tarea como completa
 
-In order to build this tool we are going to need to explore a few different topics. Most notably, we will need to:
+Para construir esta herramienta, necesitaremos explorar algunos temas diferentes. En particular, necesitaremos:
 
-1. Learn about creating command line interfaces (CLIs)
-2. Interact with a database. We will be using BoltDB in this exercise so we can learn about it.
-3. Figure out how to store our database file on different operating systems. This will basically boil down to learning about home directories.
-4. Exit codes (briefly)
-5. And probably more. I'll update this list once the exercise is done.
+1. Obtenga información sobre cómo crear interfaces de línea de comandos (CLI)
+2.  Interactuar con una base de datos. Usaremos BoltDB en este ejercicio para que podamos aprender al respecto.
+3. Descubra cómo almacenar nuestro archivo de base de datos en diferentes sistemas operativos. Esto básicamente se reducirá a aprender sobre directorios de inicio.
+4. Códigos de salida (brevemente)
+5.Y probablemente más. Actualizaré esta lista una vez que termine el ejercicio.
 
-You are welcome to tackle the problem however you see fit, but below is the order I would recommend to start.
+Le invitamos a abordar el problema como mejor le parezca, pero a continuación se muestra el orden en que recomendaría comenzar.
 
-### 1. Build the CLI shell
+### 1. Construir el shell CLI
 
-For building the CLI, I highly recommend using a third party package (library, framework, or whatever you want to call it). You can do this exercise without one, but there are a lot of edge cases you will need to handle on your own and in this case I think it is best to just pick an existing library to use.
+Para construir la CLI, le recomiendo usar un paquete de terceros (biblioteca, marco o como quiera llamarlo). Puede hacer este ejercicio sin uno, pero hay muchos casos extremos que deberá manejar por su cuenta y, en este caso, creo que es mejor elegir una biblioteca existente para usar.
 
-There are a lot of CLI libraries, and you can find most of them here: <https://github.com/avelino/awesome-go#command-line>
+Hay muchas bibliotecas de CLI, y puede encontrar la mayoría de ellas aquí: <https://github.com/avelino/awesome-go#command-line>
 
-When I code this exercise I intend to use [spf13/cobra](https://github.com/spf13/cobra). It isn't necessarily better than others out there, but it is one I have used in the past and I know it will serve my needs.
+Cuando codifico este ejercicio, pretendo usar [spf13/cobra](https://github.com/spf13/cobra).No es necesariamente mejor que otros, pero es uno que he usado en el pasado y sé que satisfará mis necesidades.
 
-Once you decide on a library, use it to create the original `task` command that displays all your subcommands, and then create stubbed subcommands for each of the actions we discussed above. The actions don't actually have to do anything with a database just yet, but we want to make sure the user typing each individual command will result in a different piece of code running.
+Una vez que elija una biblioteca, úsela para crear el comando original `task` que muestre todos sus subcomandos, y luego cree subcomandos stubbed para cada una de las acciones que discutimos anteriormente. Las acciones aún no tienen que hacer nada con una base de datos, pero queremos asegurarnos de que el usuario que escriba cada comando individual resulte en una ejecución diferente de código.
 
-For instance, let's say we defined the `task list` command to run the following Go code:
+Por ejemplo, supongamos que definimos el comando `task list` para ejecutar el siguiente código Go:
 
 ```go
 fmt.Println("This is a fake \"list\" command")
 ```
 
-Then when we used that command with our CLI we should see the following:
+Luego, cuando usamos ese comando con nuestra CLI, deberíamos ver lo siguiente:
 
 ```
 $ task list
 This is a fake "list" command
 ```
 
-After stubbing out all 3 commands, try to also look at how to parse arguments for the `task do` and `task add` commands.
+Después de eliminar los 3 comandos, intente también ver cómo analizar argumentos para los comandos `task do` y` task add`.
 
-### 2. Write the BoltDB interactions
+### 2. Escribe las interacciones de BoltDB
 
-After stubbing out your CLI commands, try writing code that will read, add, and delete data in a BoltDB database. You can find more information about using Bolt here: <https://github.com/boltdb/bolt>
+Después de eliminar los comandos de la CLI, intente escribir código que lea, agregue y elimine datos en una base de datos BoltDB. Puede encontrar más información sobre el uso de Bolt aquí <https://github.com/boltdb/bolt>
 
-*Note: I know many people claim `bolt` is abandoned, but that is inaccurate in my opinion. Instead, I would consider it a stable, completed project that no longer needs any active development. That said, there is a fork of the library created by the CoreOS team which can be found here: <https://github.com/coreos/bbolt>*
+* Nota: Sé que muchas personas afirman que `bolt` está abandonado, pero eso es inexacto en mi opinión. En cambio, lo consideraría un proyecto estable y completo que ya no necesita ningún desarrollo activo. Dicho esto, hay una bifurcación de la biblioteca creada por el equipo de CoreOS que se puede encontrar aquí: <https://github.com/coreos/bbolt>*
 
-For now, don't worry about where you store the database that bolt connects to. At this stage I intend to just use whatever directory the `task` command was run from, so I will be using code roughly like this:
+Por ahora, no se preocupe por dónde almacena la base de datos a la que se conecta Bolt. En esta etapa, tengo la intención de usar el directorio desde el que se ejecutó el comando `task`, por lo que utilizaré el código más o menos así:
 
 ```go
 db, err := bolt.Open("tasks.db", 0600, nil)
 ```
 
-Later you can dig into how to install the application so that it can be run from anywhere and it will persist our tasks regardless of where we run the CLI.
+Más adelante, puede investigar cómo instalar la aplicación para que pueda ejecutarse desde cualquier lugar y continuará con nuestras tareas independientemente de dónde ejecutemos la CLI.
 
-### 3. Putting it all together
+### 3. Poniendolo todo junto
 
-Finally, put the two pieces your wrote together so that when someone types `task add some task` it adds that task to the boltdb.
+Finalmente, junte las dos piezas que escribió para que cuando alguien escriba `task add some task` agregue esa tarea al boltdb.
 
-After that, explore how to setup and install the application so that it can be run from any directory in your terminal. This might require you to look into how to find a user's home directory on any OS (Windows, Mac OS, Linux, etc).
+Después de eso, explore cómo configurar e instalar la aplicación para que pueda ejecutarse desde cualquier directorio en su terminal. Esto puede requerir que busque cómo encontrar el directorio de inicio de un usuario en cualquier sistema operativo (Windows, Mac OS, Linux, etc.).
 
-If you'd like, you can look into how to determine this on your own, but I recommend just grabbing this package: <https://github.com/mitchellh/go-homedir>. You can read over the code to see how it works - it is only 137 lines of code - but it should take care of all the oddities between different operating systems for us.
+Si lo desea, puede investigar cómo determinar esto por su cuenta, pero le recomiendo que tome este paquete: <https://github.com/mitchellh/go-homedir>. Puede leer el código para ver cómo funciona, son solo 137 líneas de código, pero debe ocuparse de todas las rarezas entre los diferentes sistemas operativos para nosotros.
 
-After that you will need to look into how to install a binary on your computer. The first place I suggest starting is the `go install` command. (*Hint: Try `go install --help` to see what this command does.*). This is likely to be the simplest route, but there are other options (like manually copying a binary to a directory in your `$PATH`).
+Después de eso, necesitará investigar cómo instalar un binario en su computadora. El primer lugar que sugiero comenzar es el comando `go install`. (* Sugerencia: intente `go install --help` para ver qué hace este comando. *). Es probable que esta sea la ruta más simple, pero hay otras opciones (como copiar manualmente un binario a un directorio en su `$ PATH`).
 
-*Note: I suspect many users will have issues around here that are OS specific. If you do, please first check the [Github issues](https://github.com/gophercises/task/issues?utf8=%E2%9C%93&q=is%3Aissue) to see if there are any open or closed issues that are similar to your problem. I'm hoping to use that as a nice Q&A section for this exercise.*
+* Nota: sospecho que muchos usuarios tendrán problemas por aquí que son específicos del sistema operativo. Si lo hace, primero verifique los [problemas de Github] (https://github.com/gophercises/task/issues?utf8=%E2%9C%93&q=is%3Aissue) para ver si hay problemas abiertos o cerrados que son similares a tu problema Espero usar eso como una buena sección de preguntas y respuestas para este ejercicio. *
 
-If all goes well you should have a complete CLI for managing your tasks installed once done with this section.
+Si todo va bien, debe tener una CLI completa para administrar sus tareas instaladas una vez que haya terminado con esta sección.
 
 
-## Bonus
+## Bono
 
-As a bonus exercise, I recommend working on the following two new commands:
+Como ejercicio adicional, recomiendo trabajar en los siguientes dos comandos nuevos:
 
 ```
 $ task rm 1
@@ -125,8 +124,8 @@ You have finished the following tasks today:
 - clean the car
 ```
 
-The `rm` command will delete a task instead of completing it.
+El comando `rm` eliminará una tarea en lugar de completarla.
 
-The `completed` command will list out any tasks completed in the same day. You can define this however you want (last 12hrs, last 24hrs, or the same calendar date).
+El comando `completado` enumerará todas las tareas completadas en el mismo día. Puede definir esto como lo desee (últimas 12 horas, últimas 24 horas o la misma fecha del calendario).
 
-The first version of our CLI could get away with deleting tasks from the DB, but if you want these features to work you are likely going to need to tweak your DB design a bit. I'll leave that as an exercise for you to try out on your own, but if you need help feel free to get in touch - <jon@calhoun.io>
+La primera versión de nuestra CLI podría eliminar las tareas de la base de datos, pero si desea que estas características funcionen, es probable que necesite modificar un poco su diseño de base de datos. Lo dejaré como ejercicio para que lo pruebe por su cuenta, pero si necesita ayuda, no dude en ponerse en contacto - <jon@calhoun.io>
